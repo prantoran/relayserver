@@ -1,0 +1,1 @@
+APP_CONSUL_URL=localhost:8500 APP_CONSUL_PATH=ebridge go run main.go listen
