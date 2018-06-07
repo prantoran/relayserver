@@ -16,8 +16,12 @@ package cmd
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
+	"github.com/prantoran/relayserver/api"
 	"github.com/prantoran/relayserver/config"
 	"github.com/spf13/cobra"
 )
@@ -38,6 +42,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("listen called")
+		listen()
 	},
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Println("en persistentprerune")
@@ -64,6 +69,17 @@ func loadConfig() (*config.App, error) {
 	conf.Load()
 	conf.Prt()
 	return conf, nil
+}
+
+func listen() {
+	r := mux.NewRouter().StrictSlash(true)
+	r.HandleFunc("/demo", api.DemoClient(&api.DemoConf{
+		Msg: "demo works",
+	}))
+	http.Handle("/", r)
+	fmt.Println("listening on port", ebconf.Self.Port)
+	log.Fatal(http.ListenAndServe(":"+ebconf.Self.Port, r))
+
 }
 
 func init() {
